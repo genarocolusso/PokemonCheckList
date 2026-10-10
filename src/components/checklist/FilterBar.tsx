@@ -72,15 +72,45 @@ export function FilterBar({ onMarkAll, onClearAll, onOpenBackup }: FilterBarProp
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 self-end md:self-auto">
-          {/* Sprite Style Toggle */}
-          <button
-            onClick={() => setSpriteMode(spriteMode === "artwork" ? "pixel" : "artwork")}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 transition-all"
-            title={spriteMode === "artwork" ? "Alternar para sprites pixelados clássicos" : "Alternar para artwork oficial em alta resolução"}
-          >
-            <ImageIcon className="w-3.5 h-3.5 text-red-500" />
-            <span>{spriteMode === "artwork" ? "Artwork" : "Pixel"}</span>
-          </button>
+          {/* Sprite Style Segmented Selector */}
+          <div className="flex items-center gap-0.5 p-1 bg-slate-100 dark:bg-slate-800/70 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <button
+              type="button"
+              onClick={() => setSpriteMode("artwork")}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                spriteMode === "artwork"
+                  ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+              title="Artwork Oficial de Sugimori em Alta Resolução"
+            >
+              Artwork
+            </button>
+            <button
+              type="button"
+              onClick={() => setSpriteMode("home")}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                spriteMode === "home"
+                  ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+              title="Sprites Oficiais Pokémon HOME em 3D"
+            >
+              HOME
+            </button>
+            <button
+              type="button"
+              onClick={() => setSpriteMode("pixel")}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                spriteMode === "pixel"
+                  ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+              title="Sprites Pixelados Clássicos"
+            >
+              Pixel
+            </button>
+          </div>
 
           {/* Print button */}
           <button
