@@ -64,13 +64,13 @@ export function PokemonCard({ pokemon, isCaught, onToggle }: PokemonCardProps) {
       }}
       className={`group relative flex flex-col items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 select-none cursor-pointer ${
         isCaught
-          ? "bg-emerald-50/70 dark:bg-emerald-950/25 border-emerald-500/80 shadow-sm shadow-emerald-500/10 ring-1 ring-emerald-500/30"
-          : "bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:-translate-y-0.5"
+          ? "bg-emerald-50/80 dark:bg-emerald-950/45 border-emerald-500/80 dark:border-emerald-500/70 shadow-sm shadow-emerald-500/10 ring-1 ring-emerald-500/30"
+          : "bg-white dark:bg-slate-900/95 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-500 hover:shadow-md hover:-translate-y-0.5"
       }`}
     >
       {/* Top Header: Dex # and Checkbox indicator */}
       <div className="w-full flex items-center justify-between mb-1">
-        <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
+        <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-300">
           #{formattedEntry}
         </span>
 
@@ -79,7 +79,7 @@ export function PokemonCard({ pokemon, isCaught, onToggle }: PokemonCardProps) {
           className={`flex items-center justify-center w-6 h-6 rounded-lg transition-all duration-200 border ${
             isCaught
               ? "bg-emerald-500 border-emerald-600 text-white shadow-sm scale-105 animate-catch"
-              : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-transparent group-hover:border-slate-400"
+              : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-transparent group-hover:border-slate-400 dark:group-hover:border-slate-400"
           }`}
           title={isCaught ? "Marcado como capturado" : "Clique para marcar como capturado"}
         >
@@ -120,7 +120,7 @@ export function PokemonCard({ pokemon, isCaught, onToggle }: PokemonCardProps) {
 
         {/* Optional national dex subtitle if different from entryNumber */}
         {pokemon.entryNumber !== pokemon.nationalId && (
-          <span className="text-[10px] text-slate-400 font-mono">
+          <span className="text-[10px] text-slate-400 dark:text-slate-300 font-mono">
             (Nat #{String(pokemon.nationalId).padStart(3, "0")})
           </span>
         )}

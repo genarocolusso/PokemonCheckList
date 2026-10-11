@@ -9,12 +9,20 @@ import { useChecklistStore } from "@/store/useChecklistStore";
 interface GameSelectorProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectGame?: (gameId: string) => void;
+  selectedGameId?: string;
 }
 
-export function GameSelectorModal({ isOpen, onClose }: GameSelectorProps) {
-  const selectedGame = useChecklistStore((state) => state.selectedGame);
+export function GameSelectorModal({
+  isOpen,
+  onClose,
+  onSelectGame,
+  selectedGameId,
+}: GameSelectorProps) {
+  const storedSelectedGame = useChecklistStore((state) => state.selectedGame);
   const setGame = useChecklistStore((state) => state.setGame);
   const caughtPokemon = useChecklistStore((state) => state.caughtPokemon);
+  const selectedGame = selectedGameId || storedSelectedGame;
 
   const [filterGen, setFilterGen] = useState<number | "all">("all");
   const [mounted, setMounted] = useState(false);
@@ -65,7 +73,11 @@ export function GameSelectorModal({ isOpen, onClose }: GameSelectorProps) {
   ];
 
   const handleSelectGame = (id: string) => {
-    setGame(id);
+    if (onSelectGame) {
+      onSelectGame(id);
+    } else {
+      setGame(id);
+    }
     onClose();
   };
 
@@ -141,7 +153,7 @@ export function GameSelectorModal({ isOpen, onClose }: GameSelectorProps) {
                 className={`group relative text-left p-4 rounded-xl border transition-all flex flex-col justify-between overflow-hidden cursor-pointer ${
                   isSelected
                     ? "border-red-500 bg-red-50/50 dark:bg-red-950/25 shadow-md ring-2 ring-red-500/30"
-                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 hover:border-slate-300 dark:hover:border-slate-750 hover:shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm"
                 }`}
               >
                 {/* Accent Top Border */}
@@ -221,7 +233,7 @@ export function GameSelectorTrigger() {
       <button
         onClick={() => setIsOpen(true)}
         type="button"
-        className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500/40 text-left"
+        className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500/40 text-left"
         title="Trocar jogo ou região"
       >
         <div

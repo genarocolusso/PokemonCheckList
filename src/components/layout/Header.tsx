@@ -1,17 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { GameSelectorTrigger } from "@/components/game/GameSelector";
 import { ShinyToggle } from "./ShinyToggle";
 import { ThemeToggle } from "./ThemeToggle";
-import { Volume2, VolumeX, Database, Printer } from "lucide-react";
+import { Volume2, VolumeX, Database, House, Sparkles } from "lucide-react";
 import { useChecklistStore } from "@/store/useChecklistStore";
 import { DataBackupModal } from "@/components/checklist/DataBackupModal";
 
 export function Header() {
+  const pathname = usePathname();
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const soundEnabled = useChecklistStore((state) => state.soundEnabled);
   const toggleSound = useChecklistStore((state) => state.toggleSound);
+  const isHomeActive = pathname === "/";
+  const isShinyActive = pathname === "/shiny";
 
   return (
     <>
@@ -46,6 +51,32 @@ export function Header() {
 
           {/* Right: Controls & Toggles */}
           <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className={`flex items-center justify-center w-10 h-10 rounded-xl border transition ${
+                isHomeActive
+                  ? "bg-red-500 text-white border-red-600 shadow-sm"
+                  : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+              }`}
+              title="Checklist"
+              aria-label="Ir para checklist"
+            >
+              <House className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href="/shiny"
+              className={`flex items-center justify-center w-10 h-10 rounded-xl border transition ${
+                isShinyActive
+                  ? "bg-amber-500 text-white border-amber-600 shadow-sm"
+                  : "bg-amber-100 hover:bg-amber-200 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30"
+              }`}
+              title="Coleção de shinies"
+              aria-label="Ir para coleção de shinies"
+            >
+              <Sparkles className="w-4 h-4" />
+            </Link>
+
             {/* Shiny Mode Toggle */}
             <ShinyToggle />
 

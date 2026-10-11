@@ -1,16 +1,24 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { FilterStatus, PokemonType, SpriteMode } from "@/types/pokemon";
+import {
+  FilterStatus,
+  PokemonListItem,
+  PokemonType,
+  ShinyCollectionEntry,
+  SpriteMode,
+} from "@/types/pokemon";
 
 interface ChecklistState {
   selectedGame: string;
   isShiny: boolean;
   isDarkMode: boolean;
   spriteMode: SpriteMode;
+  encounterStep: number;
   searchQuery: string;
   filterStatus: FilterStatus;
   selectedType: PokemonType | null;
   caughtPokemon: Record<string, number[]>; // gameId -> array of nationalIds
+  shinyCollection: ShinyCollectionEntry[];
   soundEnabled: boolean;
 
   // Actions
@@ -18,6 +26,7 @@ interface ChecklistState {
   toggleShiny: () => void;
   toggleTheme: () => void;
   setSpriteMode: (mode: SpriteMode) => void;
+  setEncounterStep: (step: number) => void;
   setSearchQuery: (query: string) => void;
   setFilterStatus: (status: FilterStatus) => void;
   setSelectedType: (type: PokemonType | null) => void;
@@ -28,6 +37,13 @@ interface ChecklistState {
   markAll: (game: string, pokemonIds: number[]) => void;
   clearAll: (game: string) => void;
   importCaughtData: (data: Record<string, number[]>) => void;
+
+  // Shiny Collection Actions
+  addShinyHunt: (gameId: string, pokemon: PokemonListItem) => void;
+  incrementEncounter: (entryId: string, amount?: number) => void;
+  resetEncounters: (entryId: string) => void;
+  markShinyFound: (entryId: string) => void;
+  removeShinyHunt: (entryId: string) => void;
 }
 
 export const EMPTY_CAUGHT_LIST: number[] = [];
@@ -39,16 +55,20 @@ export const useChecklistStore = create<ChecklistState>()(
       isShiny: false,
       isDarkMode: false,
       spriteMode: "artwork",
+      encounterStep: 1,
       searchQuery: "",
       filterStatus: "all",
       selectedType: null,
       caughtPokemon: {},
+      shinyCollection: [],
       soundEnabled: true,
 
       setGame: (game) => set({ selectedGame: game, searchQuery: "", filterStatus: "all", selectedType: null }),
       toggleShiny: () => set((state) => ({ isShiny: !state.isShiny })),
       toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setSpriteMode: (spriteMode) => set({ spriteMode }),
+      setEncounterStep: (encounterStep) =>
+        set({ encounterStep: Math.min(50, Math.max(1, Math.round(encounterStep))) }),
       setSearchQuery: (searchQuery) => set({ searchQuery }),
       setFilterStatus: (filterStatus) => set({ filterStatus }),
       setSelectedType: (selectedType) => set({ selectedType }),
@@ -98,6 +118,82 @@ export const useChecklistStore = create<ChecklistState>()(
           },
         }));
       },
+
+      addShinyHunt: (gameId, pokemon) => {
+        const now = new Date().toISOString();
+        const entry: ShinyCollectionEntry = {
+          id: `${gameId}-${pokemon.nationalId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          gameId,
+          pokemonId: pokemon.nationalId,
+          pokemonName: pokemon.name,
+          displayName: pokemon.displayName,
+          spriteUrl: pokemon.spriteUrl,
+          shinySpriteUrl: pokemon.shinySpriteUrl,
+          artworkUrl: pokemon.artworkUrl,
+          shinyArtworkUrl: pokemon.shinyArtworkUrl,
+          encounterCount: 0,
+          shinyFound: false,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        set((state) => ({
+          shinyCollection: [entry, ...state.shinyCollection],
+        }));
+      },
+
+      incrementEncounter: (entryId, amount = 1) => {
+        const now = new Date().toISOString();
+        const safeAmount = Math.min(50, Math.max(1, Math.round(amount)));
+        set((state) => ({
+          shinyCollection: state.shinyCollection.map((entry) =>
+            entry.id === entryId
+              ? {
+                  ...entry,
+                  encounterCount: entry.encounterCount + safeAmount,
+                  updatedAt: now,
+                }
+              : entry
+          ),
+        }));
+      },
+
+      resetEncounters: (entryId) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          shinyCollection: state.shinyCollection.map((entry) =>
+            entry.id === entryId
+              ? {
+                  ...entry,
+                  encounterCount: 0,
+                  updatedAt: now,
+                }
+              : entry
+          ),
+        }));
+      },
+
+      markShinyFound: (entryId) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          shinyCollection: state.shinyCollection.map((entry) =>
+            entry.id === entryId
+              ? {
+                  ...entry,
+                  shinyFound: !entry.shinyFound,
+                  foundAt: entry.shinyFound ? undefined : now,
+                  updatedAt: now,
+                }
+              : entry
+          ),
+        }));
+      },
+
+      removeShinyHunt: (entryId) => {
+        set((state) => ({
+          shinyCollection: state.shinyCollection.filter((entry) => entry.id !== entryId),
+        }));
+      },
     }),
     {
       name: "pokemon-checklist-storage",
@@ -106,7 +202,9 @@ export const useChecklistStore = create<ChecklistState>()(
         isShiny: state.isShiny,
         isDarkMode: state.isDarkMode,
         spriteMode: state.spriteMode,
+        encounterStep: state.encounterStep,
         caughtPokemon: state.caughtPokemon,
+        shinyCollection: state.shinyCollection,
         soundEnabled: state.soundEnabled,
       }),
     }

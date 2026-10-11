@@ -50,6 +50,23 @@ export interface PokemonListItem {
   shinyHomeUrl: string;
 }
 
+export interface ShinyCollectionEntry {
+  id: string;
+  gameId: string;
+  pokemonId: number;
+  pokemonName: string;
+  displayName: string;
+  spriteUrl: string;
+  shinySpriteUrl: string;
+  artworkUrl: string;
+  shinyArtworkUrl: string;
+  encounterCount: number;
+  shinyFound: boolean;
+  createdAt: string;
+  updatedAt: string;
+  foundAt?: string;
+}
+
 export interface PokedexResponse {
   id: number;
   name: string;
