@@ -12,6 +12,7 @@ import { GAMES } from "@/utils/constants";
 
 export default function ShinyCollectionPage() {
   const [query, setQuery] = useState("");
+  const [collectionGameFilter, setCollectionGameFilter] = useState("all");
   const [isGameSelectorOpen, setIsGameSelectorOpen] = useState(false);
 
   const selectedGameId = useChecklistStore((state) => state.selectedGame);
@@ -52,6 +53,14 @@ export default function ShinyCollectionPage() {
     0
   );
   const foundCount = shinyCollection.filter((entry) => entry.shinyFound).length;
+  const collectionGames = useMemo(() => {
+    const gameIds = new Set(shinyCollection.map((entry) => entry.gameId));
+    return GAMES.filter((game) => gameIds.has(game.id));
+  }, [shinyCollection]);
+  const filteredCollection = useMemo(() => {
+    if (collectionGameFilter === "all") return shinyCollection;
+    return shinyCollection.filter((entry) => entry.gameId === collectionGameFilter);
+  }, [shinyCollection, collectionGameFilter]);
 
   return (
     <main className="no-print min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col gap-6">
@@ -189,6 +198,32 @@ export default function ShinyCollectionPage() {
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {shinyCollection.length > 0 && (
+          <div className="sm:col-span-2 lg:col-span-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-black text-slate-900 dark:text-slate-50">
+                Sua coleção
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Exibindo {filteredCollection.length} de {shinyCollection.length} caçada{shinyCollection.length === 1 ? "" : "s"}.
+              </p>
+            </div>
+            <select
+              value={collectionGameFilter}
+              onChange={(event) => setCollectionGameFilter(event.target.value)}
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm font-semibold text-slate-800 dark:text-slate-100 outline-none focus:border-amber-400 sm:w-72"
+              aria-label="Filtrar coleção por jogo"
+            >
+              <option value="all">Todos os jogos</option>
+              {collectionGames.map((game) => (
+                <option key={game.id} value={game.id}>
+                  {game.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {shinyCollection.length === 0 ? (
           <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center">
             <Sparkles className="mx-auto mb-3 w-8 h-8 text-amber-400" />
@@ -199,8 +234,18 @@ export default function ShinyCollectionPage() {
               Adicione um Pokémon acima para começar a contar encontros.
             </p>
           </div>
+        ) : filteredCollection.length === 0 ? (
+          <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center">
+            <Sparkles className="mx-auto mb-3 w-8 h-8 text-slate-400" />
+            <h2 className="font-black text-slate-900 dark:text-slate-50">
+              Nenhuma caçada nesse jogo
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Troque o filtro para ver outras entradas da coleção.
+            </p>
+          </div>
         ) : (
-          shinyCollection.map((entry) => {
+          filteredCollection.map((entry) => {
             const game = GAMES.find((item) => item.id === entry.gameId);
 
             return (
